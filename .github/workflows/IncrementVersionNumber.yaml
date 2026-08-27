@@ -48,7 +48,7 @@ jobs:
       pull-requests: write
     steps:
       - name: Dump Workflow Information
-        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@e81d48be04d069f2faa33305923cee6202208461
+        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
         with:
           shell: powershell
 
@@ -57,24 +57,24 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@e81d48be04d069f2faa33305923cee6202208461
+        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
         with:
           shell: powershell
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@e81d48be04d069f2faa33305923cee6202208461
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
         with:
           shell: powershell
 
       - name: Validate Workflow Input
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: StefanMaron/AL-Go/Actions/ValidateWorkflowInput@e81d48be04d069f2faa33305923cee6202208461
+        uses: StefanMaron/AL-Go/Actions/ValidateWorkflowInput@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@e81d48be04d069f2faa33305923cee6202208461
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -82,7 +82,7 @@ jobs:
           useGhTokenWorkflowForPush: '${{ github.event.inputs.useGhTokenWorkflow }}'
 
       - name: Increment Version Number
-        uses: StefanMaron/AL-Go/Actions/IncrementVersionNumber@e81d48be04d069f2faa33305923cee6202208461
+        uses: StefanMaron/AL-Go/Actions/IncrementVersionNumber@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
         with:
           shell: powershell
           token: ${{ steps.ReadSecrets.outputs.TokenForPush }}
@@ -93,7 +93,7 @@ jobs:
 
       - name: Finalize the workflow
         if: always()
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@e81d48be04d069f2faa33305923cee6202208461
+        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
