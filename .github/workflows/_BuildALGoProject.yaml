@@ -114,7 +114,7 @@ jobs:
           lfs: true
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/ReadSettings@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -123,7 +123,7 @@ jobs:
 
       - name: Run Build Initialize hook
         if: hashFiles(format('{0}/.AL-Go/BuildInitialize.ps1', inputs.project)) != ''
-        uses: StefanMaron/AL-Go/Actions/RunHook@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/RunHook@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -131,7 +131,7 @@ jobs:
 
       - name: Determine whether to build project
         id: DetermineBuildProject
-        uses: StefanMaron/AL-Go/Actions/DetermineBuildProject@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/DetermineBuildProject@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           skippedProjectsJson: ${{ inputs.skippedProjectsJson }}
@@ -141,7 +141,7 @@ jobs:
       - name: Read secrets
         id: ReadSecrets
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True'
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/ReadSecrets@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -166,7 +166,7 @@ jobs:
       - name: Determine ArtifactUrl
         id: determineArtifactUrl
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && inputs.artifact == ''
-        uses: StefanMaron/AL-Go/Actions/DetermineArtifactUrl@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/DetermineArtifactUrl@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -181,7 +181,7 @@ jobs:
       - name: Download Project Dependencies
         id: DownloadProjectDependencies
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True'
-        uses: StefanMaron/AL-Go/Actions/DownloadProjectDependencies@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/DownloadProjectDependencies@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -194,14 +194,14 @@ jobs:
       - name: Download Previous Release
         id: DownloadPreviousRelease
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && env.skipUpgrade == 'False'
-        uses: StefanMaron/AL-Go/Actions/DownloadPreviousRelease@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/DownloadPreviousRelease@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
 
       - name: Compile Apps
         id: compile
-        uses: StefanMaron/AL-Go/Actions/CompileApps@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/CompileApps@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && fromJson(env.workspaceCompilation).enabled == true
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
@@ -233,7 +233,7 @@ jobs:
       # DownloadAndImportBcContainerHelper has run - which is most of this step's cost. Skipping
       # the step itself avoids importing BcContainerHelper at all when it would do nothing.
       - name: Build
-        uses: StefanMaron/AL-Go/Actions/RunPipeline@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/RunPipeline@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && !(fromJson(env.workspaceCompilation).enabled == true && env.doNotPublishApps == 'True')
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
@@ -253,7 +253,7 @@ jobs:
       - name: Sign
         id: sign
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && inputs.signArtifacts && env.doNotSignApps == 'False' && (env.keyVaultCodesignCertificateName != '' || (fromJson(env.trustedSigning).Endpoint != '' && fromJson(env.trustedSigning).Account != '' && fromJson(env.trustedSigning).CertificateProfile != '')) && (hashFiles(format('{0}/.buildartifacts/Apps/*.app',inputs.project)) != '')
-        uses: StefanMaron/AL-Go/Actions/Sign@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/Sign@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           azureCredentialsJson: '${{ fromJson(steps.ReadSecrets.outputs.Secrets).AZURE_CREDENTIALS }}'
@@ -261,7 +261,7 @@ jobs:
 
       - name: Calculate Artifact names
         id: calculateArtifactsNames
-        uses: StefanMaron/AL-Go/Actions/CalculateArtifactNames@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/CalculateArtifactNames@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         if: success() || failure()
         with:
           shell: ${{ inputs.shell }}
@@ -376,7 +376,7 @@ jobs:
       - name: Analyze Test Results
         id: analyzeTestResults
         if: (success() || failure()) && env.doNotRunTests == 'False'
-        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -385,7 +385,7 @@ jobs:
       - name: Analyze BCPT Test Results
         id: analyzeTestResultsBCPT
         if: (success() || failure()) && env.doNotRunBcptTests == 'False'
-        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -394,7 +394,7 @@ jobs:
       - name: Analyze Page Scripting Test Results
         id: analyzeTestResultsPageScripting
         if: (success() || failure()) && env.doNotRunpageScriptingTests == 'False'
-        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/AnalyzeTests@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -409,7 +409,7 @@ jobs:
       # otherwise-successful compile-only build for nothing to actually clean up.
       - name: Cleanup
         if: always() && steps.DetermineBuildProject.outputs.BuildIt == 'True' && !(fromJson(env.workspaceCompilation).enabled == true && env.doNotPublishApps == 'True')
-        uses: StefanMaron/AL-Go/Actions/PipelineCleanup@9c1ab0a362f1d0d0ea10a931227a59c90d29179f
+        uses: StefanMaron/AL-Go/Actions/PipelineCleanup@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
