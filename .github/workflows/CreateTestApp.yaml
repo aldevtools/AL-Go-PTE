@@ -53,7 +53,7 @@ jobs:
     runs-on: [ windows-latest ]
     steps:
       - name: Dump Workflow Information
-        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@c2db76e6052359c81c9c5e62b374a2da77dd7988
+        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@8dabb21f84da6a9b3cd2e99594043288ecd8a363
         with:
           shell: powershell
 
@@ -62,18 +62,18 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@c2db76e6052359c81c9c5e62b374a2da77dd7988
+        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@8dabb21f84da6a9b3cd2e99594043288ecd8a363
         with:
           shell: powershell
 
       - name: Read settings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@c2db76e6052359c81c9c5e62b374a2da77dd7988
+        uses: aldevtools/AL-Go/Actions/ReadSettings@8dabb21f84da6a9b3cd2e99594043288ecd8a363
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: aldevtools/AL-Go/Actions/ReadSecrets@c2db76e6052359c81c9c5e62b374a2da77dd7988
+        uses: aldevtools/AL-Go/Actions/ReadSecrets@8dabb21f84da6a9b3cd2e99594043288ecd8a363
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -81,7 +81,7 @@ jobs:
           useGhTokenWorkflowForPush: '${{ github.event.inputs.useGhTokenWorkflow }}'
 
       - name: Creating a new test app
-        uses: aldevtools/AL-Go/Actions/CreateApp@c2db76e6052359c81c9c5e62b374a2da77dd7988
+        uses: aldevtools/AL-Go/Actions/CreateApp@8dabb21f84da6a9b3cd2e99594043288ecd8a363
         with:
           shell: powershell
           token: ${{ steps.ReadSecrets.outputs.TokenForPush }}
@@ -95,7 +95,7 @@ jobs:
 
       - name: Finalize the workflow
         if: always()
-        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@c2db76e6052359c81c9c5e62b374a2da77dd7988
+        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@8dabb21f84da6a9b3cd2e99594043288ecd8a363
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
