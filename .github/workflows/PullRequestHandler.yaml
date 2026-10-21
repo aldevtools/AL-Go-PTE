@@ -31,7 +31,7 @@ jobs:
     if: (github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name) && (github.event_name != 'pull_request')
     runs-on: windows-latest
     steps:
-      - uses: aldevtools/AL-Go/Actions/VerifyPRChanges@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+      - uses: aldevtools/AL-Go/Actions/VerifyPRChanges@c2db76e6052359c81c9c5e62b374a2da77dd7988
 
   Initialization:
     needs: [ PregateCheck ]
@@ -49,7 +49,7 @@ jobs:
       trackALAlertsInGitHub: ${{ steps.SetALCodeAnalysisVar.outputs.trackALAlertsInGitHub }}
     steps:
       - name: Dump Workflow Information
-        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: powershell
 
@@ -61,13 +61,13 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/ReadSettings@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: powershell
           get: shortLivedArtifactsRetentionDays,trackALAlertsInGitHub
@@ -86,7 +86,7 @@ jobs:
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: aldevtools/AL-Go/Actions/DetermineProjectsToBuild@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/DetermineProjectsToBuild@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
@@ -168,7 +168,7 @@ jobs:
           ref: ${{ format('refs/pull/{0}/head', github.event.pull_request.number) }}
 
       - name: Download artifacts - ErrorLogs
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: (success() || failure())
@@ -180,12 +180,12 @@ jobs:
       - name: Process AL Code Analysis Logs
         id: ProcessALCodeAnalysisLogs
         if: (success() || failure())
-        uses: aldevtools/AL-Go/Actions/ProcessALCodeAnalysisLogs@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/ProcessALCodeAnalysisLogs@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: powershell
 
       - name: Upload SARIF file to GitHub
-        uses: github/codeql-action/upload-sarif@v4
+        uses: github/codeql-action/upload-sarif@24c54180a607b1449ed407dd24f251e4e9147c8d # v4.38.3
         if: (success() || failure()) && (hashFiles(format('{0}/ErrorLogs/output.sarif.json',github.workspace)) != '')
         with:
           sarif_file: '${{ github.workspace }}/ErrorLogs/output.sarif.json'
@@ -201,7 +201,7 @@ jobs:
     steps:
       - name: Pull Request Status Check
         id: PullRequestStatusCheck
-        uses: aldevtools/AL-Go/Actions/PullRequestStatusCheck@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/PullRequestStatusCheck@c2db76e6052359c81c9c5e62b374a2da77dd7988
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -209,7 +209,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@c2db76e6052359c81c9c5e62b374a2da77dd7988
         if: success() || failure()
         env:
           GITHUB_TOKEN: ${{ github.token }}

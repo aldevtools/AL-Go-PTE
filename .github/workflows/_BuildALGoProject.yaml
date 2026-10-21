@@ -114,7 +114,7 @@ jobs:
           lfs: true
 
       - name: Read settings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/ReadSettings@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -123,7 +123,7 @@ jobs:
 
       - name: Run Build Initialize hook
         if: hashFiles(format('{0}/.AL-Go/BuildInitialize.ps1', inputs.project)) != ''
-        uses: aldevtools/AL-Go/Actions/RunHook@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/RunHook@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -131,17 +131,18 @@ jobs:
 
       - name: Determine whether to build project
         id: DetermineBuildProject
-        uses: aldevtools/AL-Go/Actions/DetermineBuildProject@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/DetermineBuildProject@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           skippedProjectsJson: ${{ inputs.skippedProjectsJson }}
           project: ${{ inputs.project }}
           baselineWorkflowRunId: ${{ inputs.baselineWorkflowRunId }}
+          buildMode: ${{ inputs.buildMode }}
 
       - name: Read secrets
         id: ReadSecrets
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True'
-        uses: aldevtools/AL-Go/Actions/ReadSecrets@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/ReadSecrets@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -166,7 +167,7 @@ jobs:
       - name: Determine ArtifactUrl
         id: determineArtifactUrl
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && inputs.artifact == ''
-        uses: aldevtools/AL-Go/Actions/DetermineArtifactUrl@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/DetermineArtifactUrl@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -181,7 +182,7 @@ jobs:
       - name: Download Project Dependencies
         id: DownloadProjectDependencies
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True'
-        uses: aldevtools/AL-Go/Actions/DownloadProjectDependencies@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/DownloadProjectDependencies@c2db76e6052359c81c9c5e62b374a2da77dd7988
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
         with:
@@ -194,14 +195,14 @@ jobs:
       - name: Download Previous Release
         id: DownloadPreviousRelease
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && env.skipUpgrade == 'False'
-        uses: aldevtools/AL-Go/Actions/DownloadPreviousRelease@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/DownloadPreviousRelease@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
 
       - name: Compile Apps
         id: compile
-        uses: aldevtools/AL-Go/Actions/CompileApps@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/CompileApps@c2db76e6052359c81c9c5e62b374a2da77dd7988
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && fromJson(env.workspaceCompilation).enabled == true
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
@@ -233,7 +234,7 @@ jobs:
       # DownloadAndImportBcContainerHelper has run - which is most of this step's cost. Skipping
       # the step itself avoids importing BcContainerHelper at all when it would do nothing.
       - name: Build
-        uses: aldevtools/AL-Go/Actions/RunPipeline@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/RunPipeline@c2db76e6052359c81c9c5e62b374a2da77dd7988
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && !(fromJson(env.workspaceCompilation).enabled == true && env.doNotPublishApps == 'True')
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
@@ -253,7 +254,7 @@ jobs:
       - name: Sign
         id: sign
         if: steps.DetermineBuildProject.outputs.BuildIt == 'True' && inputs.signArtifacts && env.doNotSignApps == 'False' && (env.keyVaultCodesignCertificateName != '' || (fromJson(env.trustedSigning).Endpoint != '' && fromJson(env.trustedSigning).Account != '' && fromJson(env.trustedSigning).CertificateProfile != '')) && (hashFiles(format('{0}/.buildartifacts/Apps/*.app',inputs.project)) != '')
-        uses: aldevtools/AL-Go/Actions/Sign@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/Sign@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           azureCredentialsJson: '${{ fromJson(steps.ReadSecrets.outputs.Secrets).AZURE_CREDENTIALS }}'
@@ -261,7 +262,7 @@ jobs:
 
       - name: Calculate Artifact names
         id: calculateArtifactsNames
-        uses: aldevtools/AL-Go/Actions/CalculateArtifactNames@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/CalculateArtifactNames@c2db76e6052359c81c9c5e62b374a2da77dd7988
         if: success() || failure()
         with:
           shell: ${{ inputs.shell }}
@@ -270,7 +271,7 @@ jobs:
           suffix: ${{ inputs.artifactsNameSuffix }}
 
       - name: Publish artifacts - apps
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: inputs.artifactsRetentionDays >= 0 && (hashFiles(format('{0}/.buildartifacts/Apps/*',inputs.project)) != '')
@@ -281,7 +282,7 @@ jobs:
           retention-days: ${{ inputs.artifactsRetentionDays }}
 
       - name: Publish artifacts - dependencies
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: inputs.artifactsRetentionDays >= 0 && env.generateDependencyArtifact == 'True' && (hashFiles(format('{0}/.buildartifacts/Dependencies/*',inputs.project)) != '')
@@ -292,7 +293,7 @@ jobs:
           retention-days: ${{ inputs.artifactsRetentionDays }}
 
       - name: Publish artifacts - test apps
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: inputs.artifactsRetentionDays >= 0 && (hashFiles(format('{0}/.buildartifacts/TestApps/*',inputs.project)) != '')
@@ -303,7 +304,7 @@ jobs:
           retention-days: ${{ inputs.artifactsRetentionDays }}
 
       - name: Publish artifacts - build output
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: (success() || failure()) && (hashFiles(format('{0}/BuildOutput.txt',inputs.project)) != '')
@@ -313,7 +314,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Publish artifacts - container event log
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: (failure()) && (hashFiles(format('{0}/ContainerEventLog.evtx',inputs.project)) != '')
@@ -323,7 +324,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Publish artifacts - test results
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: (success() || failure()) && (hashFiles(format('{0}/.buildartifacts/TestResults.xml',inputs.project)) != '')
@@ -333,7 +334,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Publish artifacts - bcpt test results
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: (success() || failure()) && (hashFiles(format('{0}/.buildartifacts/bcptTestResults.json',inputs.project)) != '')
@@ -343,7 +344,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Publish artifacts - page scripting test results
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: (success() || failure()) && (hashFiles(format('{0}/.buildartifacts/PageScriptingTestResults.xml',inputs.project)) != '')
@@ -353,7 +354,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Publish artifacts - page scripting test result details
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: (success() || failure()) && (hashFiles(format('{0}/.buildartifacts/PageScriptingTestResultDetails/*',inputs.project)) != '')
@@ -363,7 +364,7 @@ jobs:
           if-no-files-found: ignore
 
       - name: Publish artifacts - ErrorLogs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         env:
           ACTIONS_RUNNER_DISABLE_NODE_MAGLEV: 1
         if: (success() || failure()) && inputs.artifactsRetentionDays >= 0 && (hashFiles(format('{0}/.buildartifacts/ErrorLogs/*',inputs.project)) != '') && env.trackALAlertsInGitHub == 'True'
@@ -376,7 +377,7 @@ jobs:
       - name: Analyze Test Results
         id: analyzeTestResults
         if: (success() || failure()) && env.doNotRunTests == 'False'
-        uses: aldevtools/AL-Go/Actions/AnalyzeTests@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/AnalyzeTests@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -385,7 +386,7 @@ jobs:
       - name: Analyze BCPT Test Results
         id: analyzeTestResultsBCPT
         if: (success() || failure()) && env.doNotRunBcptTests == 'False'
-        uses: aldevtools/AL-Go/Actions/AnalyzeTests@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/AnalyzeTests@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -394,7 +395,7 @@ jobs:
       - name: Analyze Page Scripting Test Results
         id: analyzeTestResultsPageScripting
         if: (success() || failure()) && env.doNotRunpageScriptingTests == 'False'
-        uses: aldevtools/AL-Go/Actions/AnalyzeTests@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/AnalyzeTests@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}
@@ -409,7 +410,7 @@ jobs:
       # otherwise-successful compile-only build for nothing to actually clean up.
       - name: Cleanup
         if: always() && steps.DetermineBuildProject.outputs.BuildIt == 'True' && !(fromJson(env.workspaceCompilation).enabled == true && env.doNotPublishApps == 'True')
-        uses: aldevtools/AL-Go/Actions/PipelineCleanup@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
+        uses: aldevtools/AL-Go/Actions/PipelineCleanup@c2db76e6052359c81c9c5e62b374a2da77dd7988
         with:
           shell: ${{ inputs.shell }}
           project: ${{ inputs.project }}

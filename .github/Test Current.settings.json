@@ -1,5 +1,5 @@
 {
-  "$schema": "https://raw.githubusercontent.com/aldevtools/AL-Go/Actions/5bae7111bca9ddebe6bcb219222c0b6bfbb34d07/.Modules/settings.schema.json",
+  "$schema": "https://raw.githubusercontent.com/aldevtools/AL-Go/c2db76e6052359c81c9c5e62b374a2da77dd7988/Actions/.Modules/settings.schema.json",
   "artifact": "////latest",
   "cacheImageName": "",
   "versioningStrategy": 15
