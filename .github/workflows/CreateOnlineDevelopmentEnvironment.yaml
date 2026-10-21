@@ -50,7 +50,7 @@ jobs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
       - name: Dump Workflow Information
-        uses: StefanMaron/AL-Go/Actions/DumpWorkflowInfo@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
+        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
         with:
           shell: powershell
 
@@ -59,19 +59,19 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: StefanMaron/AL-Go/Actions/WorkflowInitialize@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
+        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
+        uses: aldevtools/AL-Go/Actions/ReadSettings@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
+        uses: aldevtools/AL-Go/Actions/ReadSecrets@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -90,7 +90,7 @@ jobs:
             Write-Host "AdminCenterApiCredentials not provided, initiating Device Code flow"
             $ALGoHelperPath = "$([System.IO.Path]::GetTempFileName()).ps1"
             $webClient = New-Object System.Net.WebClient
-            $webClient.DownloadFile('https://raw.githubusercontent.com/StefanMaron/AL-Go/Actions/f9578927ea8c73f8056eba6d8a0d2d5490df47cb/AL-Go-Helper.ps1', $ALGoHelperPath)
+            $webClient.DownloadFile('https://raw.githubusercontent.com/aldevtools/AL-Go/Actions/5bae7111bca9ddebe6bcb219222c0b6bfbb34d07/AL-Go-Helper.ps1', $ALGoHelperPath)
             . $ALGoHelperPath
             DownloadAndImportBcContainerHelper
             $authContext = New-BcAuthContext -includeDeviceLogin -deviceLoginTimeout ([TimeSpan]::FromSeconds(0))
@@ -112,13 +112,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read settings
-        uses: StefanMaron/AL-Go/Actions/ReadSettings@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
+        uses: aldevtools/AL-Go/Actions/ReadSettings@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: StefanMaron/AL-Go/Actions/ReadSecrets@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
+        uses: aldevtools/AL-Go/Actions/ReadSecrets@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -137,7 +137,7 @@ jobs:
           Add-Content -Encoding UTF8 -Path $env:GITHUB_OUTPUT -value "adminCenterApiCredentials=$adminCenterApiCredentials"
 
       - name: Create Development Environment
-        uses: StefanMaron/AL-Go/Actions/CreateDevelopmentEnvironment@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
+        uses: aldevtools/AL-Go/Actions/CreateDevelopmentEnvironment@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
         with:
           shell: powershell
           token: ${{ steps.ReadSecrets.outputs.TokenForPush }}
@@ -149,7 +149,7 @@ jobs:
 
       - name: Finalize the workflow
         if: always()
-        uses: StefanMaron/AL-Go/Actions/WorkflowPostProcess@f9578927ea8c73f8056eba6d8a0d2d5490df47cb
+        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@5bae7111bca9ddebe6bcb219222c0b6bfbb34d07
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
