@@ -74,21 +74,21 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read settings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ReadSettings@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
           get: templateUrl
 
       - name: Read secrets
         id: ReadSecrets
-        uses: aldevtools/AL-Go/Actions/ReadSecrets@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ReadSecrets@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
           getSecrets: 'ghTokenWorkflow'
 
       - name: Check for updates to AL-Go system files
-        uses: aldevtools/AL-Go/Actions/CheckForUpdates@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/CheckForUpdates@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -108,7 +108,7 @@ jobs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
       - name: Dump Workflow Information
-        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
 
@@ -117,26 +117,26 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ReadSettings@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
           get: repoName,type,powerPlatformSolutionFolder
 
       - name: Validate Workflow Input
         if: ${{ github.event_name == 'workflow_dispatch' }}
-        uses: aldevtools/AL-Go/Actions/ValidateWorkflowInput@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ValidateWorkflowInput@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: aldevtools/AL-Go/Actions/ReadSecrets@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ReadSecrets@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -145,12 +145,12 @@ jobs:
 
       - name: Determine Projects
         id: determineProjects
-        uses: aldevtools/AL-Go/Actions/DetermineProjectsToBuild@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/DetermineProjectsToBuild@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
 
       - name: Determine artifacts for release
-        uses: aldevtools/AL-Go/Actions/DetermineArtifactsForRelease@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/DetermineArtifactsForRelease@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         id: determineArtifactsForRelease
         with:
           shell: powershell
@@ -161,7 +161,7 @@ jobs:
 
       - name: Prepare release notes
         id: createreleasenotes
-        uses: aldevtools/AL-Go/Actions/CreateReleaseNotes@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/CreateReleaseNotes@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
           buildVersion: ${{ github.event.inputs.buildVersion }}
@@ -210,13 +210,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read settings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ReadSettings@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: aldevtools/AL-Go/Actions/ReadSecrets@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ReadSecrets@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -260,7 +260,7 @@ jobs:
             });
 
       - name: Deliver to NuGet
-        uses: aldevtools/AL-Go/Actions/Deliver@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/Deliver@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         if: ${{ matrix.atype == 'Apps' && fromJson(steps.ReadSecrets.outputs.Secrets).nuGetContext != '' }}
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
@@ -273,7 +273,7 @@ jobs:
           atypes: 'Apps,TestApps'
 
       - name: Deliver to Storage
-        uses: aldevtools/AL-Go/Actions/Deliver@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/Deliver@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         if: ${{ matrix.atype == 'Apps' && fromJson(steps.ReadSecrets.outputs.Secrets).storageContext != '' }}
         env:
           Secrets: '${{ steps.ReadSecrets.outputs.Secrets }}'
@@ -317,13 +317,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read settings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ReadSettings@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: aldevtools/AL-Go/Actions/ReadSecrets@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ReadSecrets@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -331,7 +331,7 @@ jobs:
           useGhTokenWorkflowForPush: '${{ github.event.inputs.useGhTokenWorkflow }}'
 
       - name: Update Version Number
-        uses: aldevtools/AL-Go/Actions/IncrementVersionNumber@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/IncrementVersionNumber@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
           token: ${{ steps.ReadSecrets.outputs.TokenForPush }}
@@ -349,7 +349,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:

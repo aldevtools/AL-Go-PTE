@@ -31,7 +31,7 @@ jobs:
     if: (github.event.pull_request.base.repo.full_name != github.event.pull_request.head.repo.full_name) && (github.event_name != 'pull_request')
     runs-on: windows-latest
     steps:
-      - uses: aldevtools/AL-Go/Actions/VerifyPRChanges@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+      - uses: aldevtools/AL-Go/Actions/VerifyPRChanges@928948221beb9e5fc3f3afafccc691bf21ff4e6a
 
   Initialization:
     needs: [ PregateCheck ]
@@ -49,7 +49,7 @@ jobs:
       trackALAlertsInGitHub: ${{ steps.SetALCodeAnalysisVar.outputs.trackALAlertsInGitHub }}
     steps:
       - name: Dump Workflow Information
-        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
 
@@ -61,13 +61,13 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ReadSettings@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
           get: shortLivedArtifactsRetentionDays,trackALAlertsInGitHub
@@ -86,7 +86,7 @@ jobs:
 
       - name: Determine Projects To Build
         id: determineProjectsToBuild
-        uses: aldevtools/AL-Go/Actions/DetermineProjectsToBuild@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/DetermineProjectsToBuild@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
           maxBuildDepth: ${{ env.workflowDepth }}
@@ -155,6 +155,70 @@ jobs:
       testAppDirs: ${{ matrix.linuxTestAppDirs }}
       codeunitRange: ${{ matrix.linuxCodeunitRange }}
       dependencyArtifactSubdir: ${{ matrix.linuxDependencySubdir }}
+      artifactNameSuffix: ${{ matrix.linuxArtifactNameSuffix }}
+
+  # Re-shapes the plain "bc-linux-build-<suffix>" artifact BuildLinux's compile step
+  # uploaded (Apps/ and TestApps/ subfolders, bc-linux-agnostic naming) into AL-Go's own
+  # Apps/TestApps artifact naming convention, using the same CalculateArtifactNames action
+  # the Windows Build job uses - so Deploy/Deliver can find Linux fast lane apps exactly
+  # the same way they find Build's. Runs on ubuntu-latest (cheap, no BC/AL work here) in
+  # keeping with the Linux fast lane's goal of avoiding Windows-runner cost.
+  PublishLinuxArtifacts:
+    needs: [ Initialization, BuildLinux ]
+    if: (!failure()) && (!cancelled()) && fromJson(needs.Initialization.outputs.buildOrderJson)[0].buildDimensionsLinuxCount > 0
+    strategy:
+      matrix:
+        include: ${{ fromJson(needs.Initialization.outputs.buildOrderJson)[0].buildDimensionsLinux }}
+      fail-fast: false
+    name: Publish artifacts for ${{ matrix.projectName }} (${{ matrix.buildMode }}, Linux fast lane)
+    runs-on: [ ubuntu-latest ]
+    env:
+      ALGoOrgSettings: ${{ vars.ALGoOrgSettings }}
+      ALGoRepoSettings: ${{ vars.ALGoRepoSettings }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Read settings
+        uses: aldevtools/AL-Go/Actions/ReadSettings@928948221beb9e5fc3f3afafccc691bf21ff4e6a
+        with:
+          shell: pwsh
+
+      # No continue-on-error here: every entry in buildDimensionsLinux has linuxFastLane
+      # enabled, so linuxArtifactNameSuffix (and therefore this artifact) is never expected
+      # to be missing. A missing/empty artifact means BuildLinux's upload silently produced
+      # nothing - that must fail the job, not degrade into a 0-app "successful" deploy.
+      - name: Download compiled apps from Linux fast lane
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: bc-linux-build-${{ matrix.linuxArtifactNameSuffix }}
+          path: '.linuxartifacts'
+
+      - name: Calculate Artifact names
+        id: calculateArtifactsNames
+        uses: aldevtools/AL-Go/Actions/CalculateArtifactNames@928948221beb9e5fc3f3afafccc691bf21ff4e6a
+        with:
+          shell: pwsh
+          project: ${{ matrix.project }}
+          buildMode: ${{ matrix.buildMode }}
+          suffix: 'PR${{ github.event.number }}'
+
+      - name: Publish artifacts - apps
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: hashFiles('.linuxartifacts/Apps/*') != ''
+        with:
+          name: ${{ steps.calculateArtifactsNames.outputs.AppsArtifactsName }}
+          path: '.linuxartifacts/Apps/'
+          if-no-files-found: ignore
+
+      - name: Publish artifacts - test apps
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        if: hashFiles('.linuxartifacts/TestApps/*') != ''
+        with:
+          name: ${{ steps.calculateArtifactsNames.outputs.TestAppsArtifactsName }}
+          path: '.linuxartifacts/TestApps/'
+          if-no-files-found: ignore
+
 
   CodeAnalysisUpload:
     needs: [ Initialization, Build ]
@@ -180,7 +244,7 @@ jobs:
       - name: Process AL Code Analysis Logs
         id: ProcessALCodeAnalysisLogs
         if: (success() || failure())
-        uses: aldevtools/AL-Go/Actions/ProcessALCodeAnalysisLogs@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/ProcessALCodeAnalysisLogs@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         with:
           shell: powershell
 
@@ -194,14 +258,14 @@ jobs:
           sha: ${{ github.event.pull_request.head.sha }}
 
   StatusCheck:
-    needs: [ Initialization, Build, BuildLinux ]
+    needs: [ Initialization, Build, BuildLinux, PublishLinuxArtifacts ]
     if: (!cancelled())
     runs-on: [ windows-latest ]
     name: Pull Request Status Check
     steps:
       - name: Pull Request Status Check
         id: PullRequestStatusCheck
-        uses: aldevtools/AL-Go/Actions/PullRequestStatusCheck@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/PullRequestStatusCheck@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
@@ -209,7 +273,7 @@ jobs:
 
       - name: Finalize the workflow
         id: PostProcess
-        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@8dabb21f84da6a9b3cd2e99594043288ecd8a363
+        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@928948221beb9e5fc3f3afafccc691bf21ff4e6a
         if: success() || failure()
         env:
           GITHUB_TOKEN: ${{ github.token }}
