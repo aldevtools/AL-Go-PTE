@@ -50,7 +50,7 @@ jobs:
       telemetryScopeJson: ${{ steps.init.outputs.telemetryScopeJson }}
     steps:
       - name: Dump Workflow Information
-        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@a57d8a3141997b24f2a06d9e2187eb2cd33cea91
+        uses: aldevtools/AL-Go/Actions/DumpWorkflowInfo@279573d4a7b52c212acec11c7cf5722e2bb3715d
         with:
           shell: powershell
 
@@ -59,19 +59,19 @@ jobs:
 
       - name: Initialize the workflow
         id: init
-        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@a57d8a3141997b24f2a06d9e2187eb2cd33cea91
+        uses: aldevtools/AL-Go/Actions/WorkflowInitialize@279573d4a7b52c212acec11c7cf5722e2bb3715d
         with:
           shell: powershell
 
       - name: Read settings
         id: ReadSettings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@a57d8a3141997b24f2a06d9e2187eb2cd33cea91
+        uses: aldevtools/AL-Go/Actions/ReadSettings@279573d4a7b52c212acec11c7cf5722e2bb3715d
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: aldevtools/AL-Go/Actions/ReadSecrets@a57d8a3141997b24f2a06d9e2187eb2cd33cea91
+        uses: aldevtools/AL-Go/Actions/ReadSecrets@279573d4a7b52c212acec11c7cf5722e2bb3715d
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -79,7 +79,7 @@ jobs:
 
       - name: Check AdminCenterApiCredentials / Initiate Device Login (open to see code)
         id: authenticate
-        uses: aldevtools/AL-Go/Actions/Authenticate@a57d8a3141997b24f2a06d9e2187eb2cd33cea91
+        uses: aldevtools/AL-Go/Actions/Authenticate@279573d4a7b52c212acec11c7cf5722e2bb3715d
         with:
           shell: powershell
           secrets: ${{ steps.ReadSecrets.outputs.Secrets }}
@@ -100,13 +100,13 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
 
       - name: Read settings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@a57d8a3141997b24f2a06d9e2187eb2cd33cea91
+        uses: aldevtools/AL-Go/Actions/ReadSettings@279573d4a7b52c212acec11c7cf5722e2bb3715d
         with:
           shell: powershell
 
       - name: Read secrets
         id: ReadSecrets
-        uses: aldevtools/AL-Go/Actions/ReadSecrets@a57d8a3141997b24f2a06d9e2187eb2cd33cea91
+        uses: aldevtools/AL-Go/Actions/ReadSecrets@279573d4a7b52c212acec11c7cf5722e2bb3715d
         with:
           shell: powershell
           gitHubSecrets: ${{ toJson(secrets) }}
@@ -125,7 +125,7 @@ jobs:
           Add-Content -Encoding UTF8 -Path $env:GITHUB_OUTPUT -value "adminCenterApiCredentials=$adminCenterApiCredentials"
 
       - name: Create Development Environment
-        uses: aldevtools/AL-Go/Actions/CreateDevelopmentEnvironment@a57d8a3141997b24f2a06d9e2187eb2cd33cea91
+        uses: aldevtools/AL-Go/Actions/CreateDevelopmentEnvironment@279573d4a7b52c212acec11c7cf5722e2bb3715d
         with:
           shell: powershell
           token: ${{ steps.ReadSecrets.outputs.TokenForPush }}
@@ -137,7 +137,7 @@ jobs:
 
       - name: Finalize the workflow
         if: always()
-        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@a57d8a3141997b24f2a06d9e2187eb2cd33cea91
+        uses: aldevtools/AL-Go/Actions/WorkflowPostProcess@279573d4a7b52c212acec11c7cf5722e2bb3715d
         env:
           GITHUB_TOKEN: ${{ github.token }}
         with:
