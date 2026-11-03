@@ -49,7 +49,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
 
       - name: Read settings
-        uses: aldevtools/AL-Go/Actions/ReadSettings@279573d4a7b52c212acec11c7cf5722e2bb3715d
+        uses: aldevtools/AL-Go/Actions/ReadSettings@9b6bf09231d6acf5a7d667d6857e3054d6ad9348
         with:
           shell: pwsh
           project: ''
@@ -58,7 +58,7 @@ jobs:
 
       - name: Resolve review context
         id: context
-        uses: aldevtools/AL-Go/Actions/ReviewAgent@279573d4a7b52c212acec11c7cf5722e2bb3715d
+        uses: aldevtools/AL-Go/Actions/ReviewAgent@9b6bf09231d6acf5a7d667d6857e3054d6ad9348
         with:
           shell: pwsh
           phase: context
@@ -95,21 +95,21 @@ jobs:
           node-version: 24
 
       - name: Setup Copilot CLI
-        uses: aldevtools/AL-Go/Actions/ReviewAgent@279573d4a7b52c212acec11c7cf5722e2bb3715d
+        uses: aldevtools/AL-Go/Actions/ReviewAgent@9b6bf09231d6acf5a7d667d6857e3054d6ad9348
         with:
           shell: pwsh
           phase: prepare
 
       - name: Setup BCQuality
         id: setup
-        uses: aldevtools/AL-Go/Actions/SetupBCQuality@279573d4a7b52c212acec11c7cf5722e2bb3715d
+        uses: aldevtools/AL-Go/Actions/SetupBCQuality@9b6bf09231d6acf5a7d667d6857e3054d6ad9348
         with:
           shell: pwsh
           bcqualitySettingsJson: ${{ needs.prepare.outputs.bcqualitySettingsJson }}
           token: ${{ secrets.BCQUALITY_TOKEN }}
 
       - name: Run Copilot PR review
-        uses: aldevtools/AL-Go/Actions/ReviewAgent@279573d4a7b52c212acec11c7cf5722e2bb3715d
+        uses: aldevtools/AL-Go/Actions/ReviewAgent@9b6bf09231d6acf5a7d667d6857e3054d6ad9348
         with:
           shell: pwsh
           phase: generate
@@ -173,7 +173,7 @@ jobs:
           path: ${{ github.workspace }}/review-output
 
       - name: Publish Copilot PR review
-        uses: aldevtools/AL-Go/Actions/ReviewAgent@279573d4a7b52c212acec11c7cf5722e2bb3715d
+        uses: aldevtools/AL-Go/Actions/ReviewAgent@9b6bf09231d6acf5a7d667d6857e3054d6ad9348
         with:
           shell: pwsh
           phase: post
